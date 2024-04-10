@@ -17,7 +17,7 @@ test('package, alias and local file mocks', async () => {
 })
 
 test('full import tree mocks —third param', async () => {
-  const { getFile } = await esmock('../../src/mocks/main.js', {}, {
+  const { getFile } = await esmock('../../src/mocks/main.mjs', {}, {
     // mocks *every* fs.readFileSync inside the import tree
     fs: { readFileSync: () => 'returned to 🌲 every caller in the tree' }
   })
