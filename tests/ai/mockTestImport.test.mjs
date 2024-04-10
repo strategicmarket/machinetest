@@ -2,11 +2,12 @@ import test from 'node:test'
 import assert from 'node:assert'
 import esmock from 'esmock'
 
+
 test('package, alias and local file mocks', async () => {
-  const cookup = await esmock('../src/cookup.js', {
-    addpkg: (a, b) => a + b,
-    '#icon': { coffee: '☕', bacon: '🥓' },
-    '../src/breakfast.js': {
+  const cookup = await esmock('../../src/mocks/cookup.js', {
+    '../../src/mocks/mathlib.js': {addpkg: (a, b) => a + b},
+    '../../src/mocks/icons.js': { coffee: '☕', bacon: '🥓' },
+    '../../src/mocks/breakfast.js': {
       default: () => ['coffee', 'bacon'],
       addSalt: meal => meal + '🧂'
     }
@@ -16,7 +17,7 @@ test('package, alias and local file mocks', async () => {
 })
 
 test('full import tree mocks —third param', async () => {
-  const { getFile } = await esmock('../src/main.js', {}, {
+  const { getFile } = await esmock('../../src/mocks/main.js', {}, {
     // mocks *every* fs.readFileSync inside the import tree
     fs: { readFileSync: () => 'returned to 🌲 every caller in the tree' }
   })
@@ -26,8 +27,8 @@ test('full import tree mocks —third param', async () => {
 
 test('mock fetch, Date, setTimeout and any globals', async () => {
   // https://github.com/iambumblehead/esmock/wiki#call-esmock-globals
-  const { userCount } = await esmock('../Users.js', {
-    '../req.js': await esmock('../req.js', {
+  const { userCount } = await esmock('../../src/mocks/Users.js', {
+    '../../src/mocks/req.js': await esmock('../../src/mocks/req.js', {
       import: { // define globals like 'fetch' on the import namespace
         fetch: async () => ({
           status: 200,
