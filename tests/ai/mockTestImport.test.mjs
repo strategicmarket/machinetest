@@ -43,7 +43,7 @@ test('mock fetch, Date, setTimeout and any globals', async () => {
 
 test('mocks "await import()" using esmock.p', async () => {
   // using esmock.p, mock definitions are kept in cache
-  const doAwaitImport = await esmock.p('../awaitImportLint.js', {
+  const doAwaitImport = await esmock.p('../../src/mocks/awaitImportLint.js', {
     eslint: { ESLint: cfg => cfg }
   })
 
@@ -53,14 +53,19 @@ test('mocks "await import()" using esmock.p', async () => {
 })
 
 test('esmock.strict mocks', async () => {
-  // replace original module definitions and do not merge them
-  const pathWrapper = await esmock.strict('../src/pathWrapper.js', {
+  // setup with esmock
+  const pathWrapper = await esmock.strict('../../src/mocks/pathWrapper.js', {
     path: { dirname: () => '/path/to/file' }
-  })
+  });
 
-  // error, because "path" mock above does not define path.basename
-  assert.rejects(() => pathWrapper.basename('/dog.🐶.png'), {
-    name: 'TypeError',
-    message: 'path.basename is not a function'
-  })
-})
+  // Correctly await the rejection of the promise
+  await assert.rejects(
+    async () => { // Make sure to use an async function if the code inside is async
+      await pathWrapper.basename('/dog.🐶.png');
+    }, 
+    {
+      name: 'TypeError',
+      message: 'path.basename is not a function'
+    }
+  );
+});
